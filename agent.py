@@ -1,4 +1,5 @@
 from google.adk.agents import Agent
+from google.adk.models.lite_llm import LiteLlm
 
 
 def get_weather(city:str) -> dict:
@@ -28,7 +29,11 @@ def get_weather(city:str) -> dict:
 
 root_agent = Agent(
     name="weather_time_agent",
-    model="gemini-2.0-flash",
+    model=LiteLlm(
+        model='ollama/mistral:latest',  # Or any other model you installed/pulled in Ollama
+        api_base='http://localhost:11434',
+        stream=True,
+    ),
     description=(
         "Agent to answer questions about the time and weather in a city."
     ),
