@@ -1,6 +1,5 @@
 from google.adk.agents import Agent
 from tools import OllamaModel, LLMTool
-from google.adk.tool import
 
 def get_weather(city:str) -> dict:
     """Retrieves the current weather report for a specified city.
