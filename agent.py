@@ -30,7 +30,7 @@ def get_weather(city:str) -> dict:
 root_agent = Agent(
     name="weather_time_agent",
     model=LiteLlm(
-        model='ollama/mistral:latest',  # Or any other model you installed/pulled in Ollama
+        model='ollama_chat/mistral:latest',  # Or any other model you installed/pulled in Ollama
         api_base='http://localhost:11434',
         stream=True,
     ),
