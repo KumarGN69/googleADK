@@ -1,5 +1,5 @@
 from google.adk.agents import Agent
-from tools import OllamaModel, LLMTool
+
 
 def get_weather(city:str) -> dict:
     """Retrieves the current weather report for a specified city.
@@ -24,8 +24,7 @@ def get_weather(city:str) -> dict:
             "error_message": f"Weather information for '{city}' is not available.",
         }
 
-ollama = OllamaModel()
-tool = LLMTool(ollama)
+
 
 root_agent = Agent(
     name="weather_time_agent",
