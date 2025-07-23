@@ -1,6 +1,7 @@
 from google.adk.agents import Agent
 from google.adk.models.lite_llm import LiteLlm
 
+
 def get_weather(city:str) -> dict:
     """Retrieves the current weather report for a specified city.
 
@@ -23,6 +24,8 @@ def get_weather(city:str) -> dict:
             "status": "error",
             "error_message": f"Weather information for '{city}' is not available.",
         }
+
+
 
 root_agent = Agent(
     name="weather_time_agent",
