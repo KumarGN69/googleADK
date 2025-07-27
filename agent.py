@@ -4,7 +4,7 @@ from google.adk.sessions import InMemorySessionService
 from google.adk.runners import Runner
 
 from google.genai import types
-import asyncio
+import asyncio, requests, json
 
 def get_weather(city:str) -> dict:
     """Retrieves the current weather report for a specified city.
@@ -15,26 +15,32 @@ def get_weather(city:str) -> dict:
     Returns:
         dict: status and result or error msg.
     """
-    if city.lower() == "new york":
-        return {
-            "status": "success",
-            "report": (
-                "The weather in New York is sunny with a temperature of 25 degrees"
-                " Celsius (77 degrees Fahrenheit)."
-            ),
-        }
-    else:
-        return {
-            "status": "error",
-            "error_message": f"Weather information for '{city}' is not available.",
-        }
-
-
+    # if city.lower() == "new york":
+    #     return {
+    #         "status": "success",
+    #         "report": (
+    #             "The weather in New York is sunny with a temperature of 25 degrees"
+    #             " Celsius (77 degrees Fahrenheit)."
+    #         ),
+    #     }
+    # else:
+    #     return {
+    #         "status": "error",
+    #         "error_message": f"Weather information for '{city}' is not available.",
+    #     }
+    API_KEY= "7f5359b6a1b944cc86f142905252707"
+    CITY=city
+    URL = f"http://api.weatherapi.com/v1/forecast.json?key={API_KEY}&q=${CITY}&days=$0&aqi=no&alerts=no"
+    response = requests.get(URL)
+    # return response.json()
+    results = response.json()
+    print(results["forecast"]["forecastday"])
+    return results["forecast"]["forecastday"]
 
 root_agent = Agent(
     name="weather_time_agent",
     model=LiteLlm(
-        model='ollama_chat/mistral:latest',  # Or any other model you installed/pulled in Ollama
+        model='ollama_chat/llama3.2:latest',  # Or any other model you installed/pulled in Ollama
         api_base='http://localhost:11434',
         stream=True,
     ),
@@ -42,7 +48,7 @@ root_agent = Agent(
         "Agent to answer questions about the time and weather in a city."
     ),
     instruction=(
-        "You are a helpful agent who can answer user questions about the time and weather in a city."
+        "Summarize the forcast for max and min temperature for the day"
     ),
     tools=[get_weather],
 )
@@ -85,6 +91,7 @@ async def call_agent_async(query: str, runner, user_id, session_id):
       if event.is_final_response():
           if event.content and event.content.parts:
              # Assuming text response in the first part
+             print(event.content)
              final_response_text = event.content.parts[0].text
           elif event.actions and event.actions.escalate: # Handle potential errors/escalations
              final_response_text = f"Agent escalated: {event.error_message or 'No specific message.'}"
@@ -99,17 +106,17 @@ async def run_conversation():
     user_id=USER_ID,
     session_id=SESSION_ID
     )
-    await call_agent_async("What is the weather like in London?",
-                                       runner=runner,
-                                       user_id=USER_ID,
-                                       session_id=SESSION_ID)
+    # await call_agent_async("What is the weather like in New York?",
+    #                                    runner=runner,
+    #                                    user_id=USER_ID,
+    #                                    session_id=SESSION_ID)
+    #
+    # await call_agent_async("What is the weather like in London, England?",
+    #                                    runner=runner,
+    #                                    user_id=USER_ID,
+    #                                    session_id=SESSION_ID) # Expecting the tool's error message
 
-    await call_agent_async("How about Paris?",
-                                       runner=runner,
-                                       user_id=USER_ID,
-                                       session_id=SESSION_ID) # Expecting the tool's error message
-
-    await call_agent_async("Tell me the weather in New York",
+    await call_agent_async("What is the weather like in Paris, France",
                                        runner=runner,
                                        user_id=USER_ID,
                                        session_id=SESSION_ID)
